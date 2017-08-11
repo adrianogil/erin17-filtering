@@ -14,7 +14,7 @@
 
 % SBC-Template can be found here:
 % http://www.sbc.org.br/documentos-da-sbc/summary/169-templates-para-artigos-e-capitulos-de-livros/878-modelosparapublicaodeartigos
-\title{Visualizando A aplicação de Filtros de Kalman na Estabilização de Controle para Realidade Virtual}
+\title{Visualizando A Aplicação de Filtros de Kalman na Estabilização de Controle para Realidade Virtual}
 
 \author{Thiago S. Figueira\inst{1}, Jorge Veiga\inst{1}, Adriano M. Gil\inst{1} }
 
@@ -84,6 +84,8 @@ Em última instância, a pergunta é de que maneira pode-se abstrair o problema de 
 % Alguns exemplos de aplicações
 Entre alguns exemplos de aplicações genéricas dos Filtros de Kalman, temos em \cite{demkowiczkalman} a demonstração de uma aplicação em Java do Filtro de Kalman em Sistemas sondadores de multi-feixe para remover ruído na visualização 3d do fundo do mar, onde os dados de entrada são filtrados duas vezes em diferentes orientações. O filtro de Kalman tem uma grande utilidade em robótica \cite{choset2005principles}, pois normalmente o conhecimento de mundo do robô deriva de medidas fornecidas por sensores imperfeitos e ruidosos.
 
+Alguns artigos trabalham com a filtragem de sensores baseados em acelerômetro. Em \cite{schlomer2008gesture} Usa modelo oculto de Markov para reconhecimento de gestos do usuários feitos em um Wiimote, o controle do Wii. Usa filtros simples para remover pontos que não são suficientemente significantes. \cite{shiratori2008accelerometer} Utiliza múltiplos controles de Wii para criar animações procedurais. Analisa as informações do acelerômetro do Wiimote, e aplica Filtros Kalman para remover o ruído de movimento
+
 \section{Filtros} \label{sec:filters}
 O dicionário Michaelis, dentre suas diversas definições, conceitua filtro como \enquote{o que tem a finalidade de selecionar}, contudo um olhar mais cuidadoso é capaz de navegar pelo emaranhado de palavras e identificar que um filtro essencialmente modifica de alguma forma a informação que recebe. Partido desta definição, \enquote{tudo é um filtro} [Ref1], pois os sinais sofrem interferência, portanto ruídos, dos meios externos e internos, sendo assim modificados. Para os objetivos deste texto, basta compreender um filtro como um objeto ou função cuja principal funcionalidade é remover partes indesejadas de um sinal ou ainda selecionar somente partes específicas do mesmo, como elementos que se enquadrem em determinada frequência. [Ref2] De maneira simplificada, o efetivo funcionamento de um filtro se dá conforme a ilustração:
 
@@ -117,19 +119,37 @@ Onde $\hat{X}_k$ é a estimativa do instante $k$, $K_k$ é o ganho de Kalman no in
 
 \section{Controle para Realidade Virtual}
 
+% * Qual a importância/valor de usar controles?
+% * Tipos de Controles
+% * Problemas/Imprecisão
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.6\textwidth]{images/gear_controller.jpg}
+\caption{Filtragem do cursor de VR. Amostras ruidosas em vermelho e valor filtrado em azul.}
+\label{fig:filter01}
+\end{figure}
+
 \section{Ferramenta de Visualização de Filtros} \label{sec:viztool}
 
-% TODO
-
-\section{Implementação} \label{sec:implementation}
-
-% TODO
+Com o objetivo
 
 \section{Resultados} \label{sec:results}
 
-% TODO
+Nossa implementação em Unity foi executada em um aparelho Samsung S8 acoplado no óculos \textit{GearVR SM-R324}. Foi utilizado o controle oficial da Samsung que acompanha o óculos de realidade virtual \textit{GearVR}.
+
+A figura \ref{fig:filter01} mostra um \textit{screenshot} da aplicação em Realidade Virtual com a filtragem de cursor ativa. O caminho do cursor é definido pela rotação atual do controler do \textit{GearVR}. A posição do cursor é calculada como o ponto que intercepta uma esfera de tamanho unitário e um raio partindo do cursor.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.5\textwidth]{images/image_01.png}
+\caption{Filtragem do cursor de VR. Amostras ruidosas em vermelho e valor filtrado em azul.}
+\label{fig:filter01}
+\end{figure}
 
 \section{Conclusão} \label{sec:conclusion}
+
+Pelos resultados obtidos, verificamos que a nossa aplicação Unity foi capaz de filtrar as posições ruidosas geradas pelo controller e garantir uma
 
 % TODO
 
