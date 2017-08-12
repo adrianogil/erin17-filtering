@@ -16,14 +16,14 @@
 
 % SBC-Template can be found here:
 % http://www.sbc.org.br/documentos-da-sbc/summary/169-templates-para-artigos-e-capitulos-de-livros/878-modelosparapublicaodeartigos
-\title{Visualizando A Aplicação de Filtros de Kalman na Estabilização de Controle para Realidade Virtual}
+\title{Visualização do Filtro de Kalman na Estabilização de Controle para Realidade Virtual}
 
-\author{Thiago S. Figueira\inst{1}, Jorge Veiga\inst{1}, Adriano M. Gil\inst{1} }
+\author{Thiago S. Figueira\inst{1}, Adriano M. Gil\inst{1} }
 
 \address{Samsung Instituto de Desenvolvimento para a Informática da Amazônia
   (SIDIA)\\
   Manaus -- AM -- Brazil
-  \email{\{t.figueira,jorge.v,adriano.gil\}@samsung.com}
+  \email{\{t.figueira,adriano.gil\}@samsung.com}
 }
 
 \begin{document}
@@ -126,23 +126,23 @@ Onde $\hat{X}_k$ é a estimativa do instante $k$, $K_k$ é o ganho de Kalman no in
 
 \section{Controle para Realidade Virtual} \label{sec:vrcontroller}
 
-% * Qual a importância/valor de usar controles?
-
-
-% * Tipos de Controles
-
-
-
-% * Descrever controle da Samsung
-A figura \ref{fig:vrcontroller} mostra o controle que acompanha o óculus de realidade virtual \textit{GearVR SM-R324} da Samsung. A \textit{Oculus} é atualmente parceira da Samsung na distribuição de soluções de realidade virtual utilizando dispositivos móveis e disponibiliza um \textit{SDK} para uso de funcionalidades específicas de aplicações de realidade virtual, dentre elas uma API para captação dos dados de rotação do controle \cite{gearvrinputdocs}.
-
-
 \begin{figure}[ht]
 \centering
 \includegraphics[width=.6\textwidth]{images/gear_controller.jpg}
 \caption{Filtragem do cursor de VR. Amostras ruidosas em vermelho e valor filtrado em azul.}
 \label{fig:vrcontroller}
 \end{figure}
+
+% * Qual a importância/valor de usar controles?
+Aplicativos de realidade virtual normalmente são executados dentro de óculos especialmente feitos para a renderização de duas telas, uma para cada olho, conferindo assim a ilusão de profundidade de um universo virtual, maximizando a imersão do usuário. Em aplicações de realidade virtual, normalmente o controle posiciona um cursor que representa o foco de interação do usuário.
+
+% * Tipos de Controles
+Existem vários tipos de controles, o próprio headset, i.e., o equipamento de realidade virtual vestível também possui um controle baseado no giroscópio, também existem outros tipos de controle que além disso fornecem informações posicionais, adicionando um grau de liberdade a mais para o usuário, que pode manipular em diferentes graus na profundidade do espaço virtual.
+
+
+% * Descrever controle da Samsung
+A figura \ref{fig:vrcontroller} mostra o controle que acompanha o óculus de realidade virtual \textit{GearVR SM-R324} da Samsung. A \textit{Oculus} é atualmente parceira da Samsung na distribuição de soluções de realidade virtual utilizando dispositivos móveis e disponibiliza um \textit{SDK} para uso de funcionalidades específicas de aplicações de realidade virtual, dentre elas uma API para captação dos dados de rotação do controle \cite{gearvrinputdocs}.
+
 
 % * Problemas/Imprecisão
 
@@ -159,22 +159,18 @@ Dado o objetivo de remover ruído de um determinando conjunto de dados sinal, é d
 
 
 % Describe Unity implementation - Noise visualization
-
+Para visualizar o ruido, utilizamos elementos de partículas ou \textit{ParticleSystem} para renderizar os pontos onde o cursor deveria estar levando em conta as entradas ruidosas tais como recebidas pelo controle. As partículas geradas foram configuradas para ter um cor destoante, uma tonalidade de vermelho indica a entrada real obtida pelo controle, e ao longo do tempo reduz-se a luminosidade das partículas de modo a adicionar uma informação temporal a visualização gerada. Assim, pontos vermelhos mais vivos indicam os dados mais recentes recebidos pelo controle enquanto pontos mais fracos representam posições mais antigas.
 
 
 % Describe Unity implementation - GearVRInput component
-
+Implementamos um componente de gerenciamento de entradas do usuário, permitindo mudar o cursor de acordo com a posição da cabeça do usuário fornecida pelo \textit{headset GearVR} ou pela rotação do controle.
 
 
 % Describe interaction with controller
-
+O controle de realidade virtual da Samsung, tal como descrito na seção \ref{sec:vrcontroller}, possibilita obter dados de rotação em tempo real \cite{gearvrinputdocs} na forma de um \textit{quaternion} \cite{quaternionhamilton1844ii} que representa a orientação atual do dispositivo. \textit{Quaternions} são um sistema númerico que extende os números complexos e são utilizados por muitas \textit{APIs} gráficas para representar valores de rotação. O SDK da \textit{Oculus} permite obter a rotação em coordenadas angulares (ângulos de Euler). Para cada valor angular é calculada um ponto do cursor que intercepta uma esfera de tamanho unitário e um raio partindo da representação virtual do controle.
 
 
 \section{Resultados} \label{sec:results}
-
-Nossa implementação em Unity foi executada em um aparelho Samsung S8 acoplado no óculos \textit{GearVR SM-R324}. Foi utilizado o controle oficial da Samsung que acompanha o óculos de realidade virtual \textit{GearVR}.
-
-A figura \ref{fig:filter01} mostra um \textit{screenshot} da aplicação em Realidade Virtual com a filtragem de cursor ativa. O caminho do cursor é definido pela rotação atual do controler do \textit{GearVR}. A posição do cursor é calculada como o ponto que intercepta uma esfera de tamanho unitário e um raio partindo do cursor.
 
 \begin{figure}[ht]
 \centering
@@ -183,19 +179,28 @@ A figura \ref{fig:filter01} mostra um \textit{screenshot} da aplicação em Realid
 \label{fig:filter01}
 \end{figure}
 
-% \begin{figure}[!tbp]
-%   \centering
-%   \subfloat[Flower one.]{\includegraphics[width=.5\textwidth]{images/image_01.png}\label{fig:filter01}}
-%   \hfill
-%   \subfloat[Flower one.]{\includegraphics[width=.5\textwidth]{images/image_02.png}\label{fig:filter02}}
-%   \caption{Filtragem do cursor de VR. Amostras ruidosas em vermelho e valor filtrado em azul.}
-% \end{figure}
+Nossa implementação em Unity foi executada em um aparelho Samsung S8 acoplado no óculos \textit{GearVR SM-R324}. Foi utilizado o controle oficial da Samsung que acompanha o óculos de realidade virtual \textit{GearVR}. Para fins de teste, foi gerada uma esfera invertida e um código em \textit{shader} para exibir grids na superfíce da esfera gerando um ambiente branco de cor sólida e sem efeitos de iluminação.
 
+Toda aplicação \textit{GearVR} distribuída na \textit{Oculus Store} \cite{gearvrstore} pode ser executada nos modelos de celulares Samsung mais avançados e acoplado em um óculos \textit{GearVR}. A qualquer momento durante a execução da aplicação é possível acessar um meno de opções que permite registrar \textit{screenshots} ou gravar vídeos da experiência do usuário dentro do mundo virtual da aplicação.
 
+A figura \ref{fig:filter01} mostra um \textit{screenshot} da aplicação em Realidade Virtual com a filtragem de cursor ativa. O caminho do cursor é definido pela rotação atual do controler do \textit{GearVR}. A posição do cursor é calculada na intercecção de uma esfera de tamanho unitário e a direção atual do controle.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.5\textwidth]{images/image_02.png}
+\caption{Filtragem do cursor de VR. Amostras ruidosas em vermelho e valor filtrado em azul.}
+\label{fig:filter02}
+\end{figure}
+
+Na figura \ref{fig:filter01} e \ref{fig:filter02} verifica-se que a linha azul forma-se de maneira estável ao longo do caminho percorrido pelo cursor. Enquanto os pontos vermelhos se espalham ao redor desse caminho, indicando que a amplitude máxima de instabilidade é cerca de duas vezes maior que o tamanho do cursor, ou seja, facilmente perceptível pelo usuário e que impossibilitaria o usuário de realizar movimentos precisos e estáveis.
 
 \section{Conclusão} \label{sec:conclusion}
 
+Neste trabalho apresentamos uma implementação do filtro de Kalman para estabilização do controle de realidade virtual da Samsung. Concomitantemente, é descrita a visualização das entradas ruidosas fornecidas pelo controle e o efeito resultante do filtro de Kalman. Afim de estimular a reutilização da implementações feitas, foram gerados componentes para rápida configuração.
+
 Pelos resultados obtidos, verificamos que a nossa solução desenvolvida em Unity foi capaz de filtrar as posições ruidosas geradas pelo controller e garantir um controle mais estável em aplicações de realidade virtual. E também foi feita uma implementação para visualização da filtragem de entradas ruídosas.
+
+Como trabalhos futuros propõe-se...
 
 % TODO
 
