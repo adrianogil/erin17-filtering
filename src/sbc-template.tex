@@ -126,17 +126,27 @@ Onde $\hat{X}_k$ é a estimativa do instante $k$, $K_k$ é o ganho de Kalman no in
 
 \section{Controle para Realidade Virtual} \label{sec:vrcontroller}
 
-% * Descrever controle da Samsung
 % * Qual a importância/valor de usar controles?
+
+
 % * Tipos de Controles
-% * Problemas/Imprecisão
+
+
+
+% * Descrever controle da Samsung
+A figura \ref{fig:vrcontroller} mostra o controle que acompanha o óculus de realidade virtual \textit{GearVR SM-R324} da Samsung. A \textit{Oculus} é atualmente parceira da Samsung na distribuição de soluções de realidade virtual utilizando dispositivos móveis e disponibiliza um \textit{SDK} para uso de funcionalidades específicas de aplicações de realidade virtual, dentre elas uma API para captação dos dados de rotação do controle \cite{gearvrinputdocs}.
+
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=.6\textwidth]{images/gear_controller.jpg}
 \caption{Filtragem do cursor de VR. Amostras ruidosas em vermelho e valor filtrado em azul.}
-\label{fig:filter01}
+\label{fig:vrcontroller}
 \end{figure}
+
+% * Problemas/Imprecisão
+
+
 
 \section{Ferramenta de Visualização de Filtros} \label{sec:viztool}
 
@@ -148,10 +158,17 @@ A proposta deste artigo é a implementação de uma ferramenta para visualizar a ap
 Dado o objetivo de remover ruído de um determinando conjunto de dados sinal, é de grande interesse ao desenvolver conseguir entender como esse ruído afeta a aplicação de realidade virtual, seja produzindo um cursor mais trêmulo ou dificultando a interação do usuário. 
 
 
-% Describe Unity implementation
+% Describe Unity implementation - Noise visualization
+
+
+
+% Describe Unity implementation - GearVRInput component
+
 
 
 % Describe interaction with controller
+
+
 
 \section{Resultados} \label{sec:results}
 
@@ -178,7 +195,7 @@ A figura \ref{fig:filter01} mostra um \textit{screenshot} da aplicação em Realid
 
 \section{Conclusão} \label{sec:conclusion}
 
-Pelos resultados obtidos, verificamos que a nossa aplicação Unity foi capaz de filtrar as posições ruidosas geradas pelo controller e garantir uma
+Pelos resultados obtidos, verificamos que a nossa solução desenvolvida em Unity foi capaz de filtrar as posições ruidosas geradas pelo controller e garantir um controle mais estável em aplicações de realidade virtual. E também foi feita uma implementação para visualização da filtragem de entradas ruídosas.
 
 % TODO
 
