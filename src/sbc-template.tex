@@ -11,6 +11,8 @@
 %\usepackage[brazil]{babel}
 \usepackage[latin1]{inputenc}
 
+\usepackage{amssymb}
+
 
 \sloppy
 
@@ -31,43 +33,26 @@
 \maketitle
 
 \begin{abstract}
-  This meta-paper describes the style to be used in articles and short papers
-  for SBC conferences. For papers in English, you should add just an abstract
-  while for the papers in Portuguese, we also ask for an abstract in
-  Portuguese (``resumo''). In both cases, abstracts should not have more than
-  10 lines and must be in the first page of the paper.
+   Kalman filter is a digital filter capable of predicting, with high precision, past, present and future states given a linear dynamic system with gaussian noise. Even though an effective tool, Kalman filter is not usually used in Unity3D development environment. Therefore, this paper intends to implement  a visualization tool in which the filter is applied to a noisy virtual reality device joystick. It's also an objective to explain how the filter works as well as present the results of its use.
 \end{abstract}
 
 \begin{resumo}
-  Este meta-artigo descreve o estilo a ser usado na confecção de artigos e
-  resumos de artigos para publicação nos anais das conferências organizadas
-  pela SBC. É solicitada a escrita de resumo e abstract apenas para os artigos
-  escritos em português. Artigos em inglês deverão apresentar apenas abstract.
-  Nos dois casos, o autor deve tomar cuidado para que o resumo (e o abstract)
-  não ultrapassem 10 linhas cada, sendo que ambos devem estar na primeira
-  página do artigo.
+  O filtro de Kalman é um filtro digital capaz de prever, com precisão elevada, estados passados, presentes e futuros dado um sistema dinâmico linear cujo ruído seja gaussiano. Embora uma ferramenta eficaz, o filtro de Kalman não é comumente utilizado no ambiente de desenvolvimento Unity3D, logo o presente artigo se propõe a implementar uma ferramenta de visualização da aplicação do citado filtro em um ruidoso controle (\textit{joystick}) de um dispostivo de realidade virtual. Objetiva-se também explanar o funcionamento do filtro bem como mostrar os resultados de seu uso.
 \end{resumo}
 
 
 \section{Introdução}
 
 % 1. Contextualizar o problema
- Muitos jogos ou aplicações sérias fazem uso de hardwares específico para possibilitar a interação do usuário, e.g, um gesto com as mãos, movimentos corporais. Sensores inerciais - tais como o acelerômetro, giroscópio e magnetómetro - medem a aplicação de força, taxa angular ou campo magnético, e podem ser usados como forma de virtualização de um evento na realidade do usuário para dentro de um cenário virtual. Assim jogadores de \textit{first person shooters} (FPS) conseguem disparar utilizando a posição de suas mãos, uma nave espacial rotaciona junto com o usuário, entre outras aplicações.
+Muitos jogos ou aplicações sérias fazem uso de hardwares específico para possibilitar a interação do usuário, e.g, um gesto com as mãos, movimentos corporais. Sensores inerciais - tais como o acelerômetro, giroscópio e magnetômetro - medem a aplicação de força, taxa angular ou campo magnético, e podem ser usados como forma de virtualização de um evento na realidade do usuário para dentro de um cenário virtual. Assim jogadores de \textit{first person shooters} (FPS) conseguem disparar utilizando a posição de suas mãos, uma nave espacial rotaciona junto com o usuário, entre outras aplicações.
 
 
-Os sensores têm a finalidade de mensurar comportamentos ou características da realidade, através de transdutores que convertem uma energia de entrada em outra de saída. Nesse processo é feita uma amostragem do evento de interesse, i.e., ocorre uma série de capturas da realidade de maneira a converter a medida de interesse em um conjunto contínuo de valores. Este processo também pode ser suscetível a erros, seja na natureza física do transdutor que não traduz fielmente os valores medidos, ou na taxa de amostragem que pode não ser suficiente para capturar a informação de interesse, ou na discretização dos valores contínuos da realidade. Somadas todas essas possibilidades, percebe-se que as informações essenciais (velocidade, temperatura, localização no GPS, etc.) podem sofrer ruídos ou imprecisão, isto é, o valor medido não reflete em sua totalidade a verdadeira condição do sistema no momento da medição.
-
-% s exemplos de  são variados:  um pequeno robô de jardim que precisa saber sua verdadeira localização a fim de evitar quedas; um mapa de navegação para carros que, dentro de um túnel, precise cumprir sua função com precisão para guiar o motorista; ou ainda, a necessidade de conhecer-se a temperatura de um foguete cujo alto aquecimento impeça a medição direta através de um sensor. Se analisadas com cadência, as situações ilustradas possuem em comum a existência de informações essenciais (velocidade, temperatura, localização no GPS, etc.) que sofrem ruídos ou imprecisão, isto é, o valor medido não reflete em sua totalidade a verdadeira condição do sistema no momento da medição.
-
-% A imprecisão é um problema muito comum em
+Estes sensores têm a finalidade de mensurar comportamentos ou características da realidade através de transdutores que convertem uma energia de entrada em outra de saída. Nesse processo é feita uma amostragem do evento de interesse, i.e., ocorre uma série de capturas da realidade de maneira a converter a medida de interesse em um conjunto contínuo de valores. Este processo também pode ser suscetível a erros, seja na natureza física do transdutor que não traduz fielmente os valores medidos, ou na taxa de amostragem que pode não ser suficiente para capturar a informação de interesse, ou na discretização dos valores contínuos da realidade. Somadas todas essas possibilidades, percebe-se que as informações essenciais (velocidade, temperatura, localização no GPS, etc.) podem sofrer ruídos ou imprecisão, isto é, o valor medido não reflete em sua totalidade a verdadeira condição do sistema no momento da medição.
 
 % * Definição introdutória de Filtros
-Desta forma, a fim de garantir o maior nível de aproximação no que se refere à confiabilidade das informações tratadas, os filtros digitais tornam-se ferramentas preciosas as quais visam garantir que somente os dados relevantes, pré-definidos a partir de condições estabelecidas pelas partes interessadas, sejam considerados, é o caso de filtros de passa-alta e passa-baixa, por exemplo. Dentre estes diferentes tipos de filtro passíveis de implementação, a solução mais apropriada para os problemas acima exemplificados é o filtro de Kalman.
+Desta forma, a fim de garantir o maior nível de aproximação no que se refere à confiabilidade das informações tratadas, os filtros digitais tornam-se ferramentas preciosas as quais visam garantir que somente os dados relevantes, pré-definidos a partir de condições estabelecidas pelas partes interessadas, sejam considerados, é o caso de filtros de passa-alta e passa-baixa, por exemplo. Dentre estes diferentes tipos de filtro passíveis de implementação, a solução mais apropriada para o problema acima citado é o filtro de Kalman.
 
-
-Entende-se que o filtro de Kalman descreve de uma solução recursiva para o problema de filtragem de dados em um sistema dinâmico linear [1], isto é, trata-se de um sistema capaz de predizer um estado futuro baseado nas últimas informações disponíveis. Descrito como um sistema de recursivo de predição ótima [2], o filtro de Kalman é efetivamente utilizado em muitas aplicações do mundo real, uma delas foi a própria viagem do homem à Lua, quando necessitava-se estimar as trajetórias para a ida e volta deste satélite [3].   Embora extremamente eficiente e aproveitável, esta ferramenta carece de explanações mais aproximadas dos estudantes que iniciam seus estudos acerca de filtros digitais, pois abordam o tema exclusivamente do ponto de vista da mais avançada matemática. Isto, no entanto, não pode servir de como barreira que impeça o acesso à informação por parte daqueles cujos fundamentos matemáticos não sejam de todo solidificados.
-
-
+Entende-se que o filtro de Kalman descreve de uma solução recursiva para o problema de filtragem de dados em um sistema dinâmico linear \cite{WelchBishop}, isto é, trata-se de um sistema capaz de predizer um estado futuro baseado nas últimas informações disponíveis. Descrito como um sistema de recursivo de predição ótima, o filtro de Kalman é efetivamente utilizado em muitas aplicações do mundo real, uma delas foi a própria viagem do homem à Lua, quando necessitava-se estimar as trajetórias para a ida e volta deste satélite \cite{GrewalAndrews}.   Embora extremamente eficiente e aproveitável, esta ferramenta carece de explanações mais aproximadas dos estudantes que iniciam seus estudos acerca de filtros digitais, pois abordam o tema exclusivamente do ponto de vista da mais avançada matemática. Isto, no entanto, não pode servir de como barreira que impeça o acesso à informação por parte daqueles cujos fundamentos matemáticos não sejam de todo solidificados.
 
 % * Contextualizar a necessidade didática
 %     * Dificuldade de compreensão
@@ -76,7 +61,7 @@ Embora extremamente eficiente e aproveitável, esta ferramenta carece de explanaç
 
 
 % * Resumo proposta
-Em última instância, a pergunta é de que maneira pode-se abstrair o problema de modo que seja possível aplicar o filtro de Kalman? Ora, a simplicidade na compreensão a respeito daquilo que o filtro faz não se reflete no entendimento de suas fórmulas, especialmente para aqueles cujos fundamentos matemáticos não sejam especialmente consolidados.  Comumente as variáveis e seus respectivos correspondentes na fórmula podem ser desconhecidos ou a má interpretação conduz a resultados inesperados. Tendo em vista aclarar o emprego do filtro de Kalman, objetiva-se aqui exemplificar seu emprego em um joystick numa aplicação de realidade virtual. O ruído está presente nas leituras acerca do posicionamento deste controlador, portanto intenta-se a melhoria no reconhecimento deste sinal.
+Em última instância, a pergunta é de que maneira pode-se abstrair o problema de modo que seja possível aplicar o filtro de Kalman? Ora, a simplicidade na compreensão a respeito daquilo que o filtro faz não se reflete no entendimento de suas fórmulas.  Comumente as variáveis e seus respectivos correspondentes na fórmula podem ser desconhecidos ou a má interpretação conduz a resultados distantes do esperado. Tendo em vista aclarar o emprego do filtro de Kalman, objetiva-se aqui exemplificar seu emprego em um \textit{ joystick} numa aplicação de realidade virtual. O ruído está presente nas leituras acerca do posicionamento deste controlador, portanto intenta-se a melhoria no reconhecimento deste sinal.
 
 
 % * Estrutura do artigo
@@ -94,31 +79,69 @@ Alguns artigos trabalham com a filtragem de sensores baseados em acelerômetro. E
 Em termos de softwares matemáticos educativos para aumentar a compreensão, \cite{guyer2008computer} apresenta uma classificação em sistema de algebra computacional, softwares instrutivos e sistemas de propósito gerais. Este último por sua vez é dividido em ferramenta de propósito de visualização, ferramenta de informação e de ensino de conceitos. Aqui neste trabalho, definimos nossa proposta como sendo de propósito de visualização, pois fornece uma compreensão aumentada de como o sinal ruidoso é filtrado na aplicação de filtros de Kalman.
 
 \section{Filtros} \label{sec:filters}
-O dicionário Michaelis, dentre suas diversas definições, conceitua filtro como \enquote{o que tem a finalidade de selecionar}, contudo um olhar mais cuidadoso é capaz de navegar pelo emaranhado de palavras e identificar que um filtro essencialmente modifica de alguma forma a informação que recebe. Partido desta definição, \enquote{tudo é um filtro} [Ref1], pois os sinais sofrem interferência, portanto ruídos, dos meios externos e internos, sendo assim modificados. Para os objetivos deste texto, basta compreender um filtro como um objeto ou função cuja principal funcionalidade é remover partes indesejadas de um sinal ou ainda selecionar somente partes específicas do mesmo, como elementos que se enquadrem em determinada frequência. [Ref2] De maneira simplificada, o efetivo funcionamento de um filtro se dá conforme a ilustração:
+O dicionário Michaelis, dentre suas diversas definições, conceitua filtro como \enquote{o que tem a finalidade de selecionar}, contudo um olhar mais cuidadoso é capaz de navegar pelo emaranhado de palavras e identificar que um filtro essencialmente modifica de alguma forma a informação que recebe. Partido desta definição, \enquote{tudo é um filtro} \cite{FILTERS07}, pois os sinais sofrem interferência, portanto ruídos, dos meios externos e internos, sendo assim modificados. Para os objetivos deste texto, basta compreender um filtro como um objeto ou função cuja principal funcionalidade é remover partes indesejadas de um sinal ou ainda selecionar somente partes específicas do mesmo, como elementos que se enquadrem em determinada frequência. De maneira simplificada, o efetivo funcionamento de um filtro se dá conforme a ilustração:
 
+% Acrescentar a ilustração sobre o funcionamento básico de filtros aqui. Aqueles três quadrados
 
-Há outra distinção importante, citada há poucas linhas, a qual deve ser salientada sobre filtros: podem ser objetos ou funções e isto basicamente retrata a existência dos filtros digitais e analógicos. Fundamentalmente a dessemelhança ocorre nos meios sobre os quais cada filtro opera, logo não é difícil discernir que os filtros analógicos fazem uso de componentes eletrônicos, tais como resistores e capacitores, enquanto os digitais operam sobre informações computadorizadas por meio de cálculos numéricos [Ref2]. Cabe salientar, no entanto, a relação não mutuamente exclusiva, visto que se pode estabelecer uma correspondência entre ambos através do uso de conversores analógico-digital bem como digital-analógico. Tendo em vista o objetivo proposto, dar-se-á o foco aos filtros digitais.
+Há outra distinção importante, citada há poucas linhas, a qual deve ser salientada sobre filtros: podem ser objetos ou funções e isto basicamente retrata a existência dos filtros digitais e analógicos. Fundamentalmente a dessemelhança ocorre nos meios sobre os quais cada filtro opera, logo não é difícil discernir que os filtros analógicos fazem uso de componentes eletrônicos, tais como resistores e capacitores, enquanto os digitais operam sobre informações computadorizadas por meio de cálculos numéricos. Cabe salientar, no entanto, a relação não mutuamente exclusiva, visto que se pode estabelecer uma correspondência entre ambos através do uso de conversores analógico-digital bem como digital-analógico. Tendo em vista o objetivo proposto, dar-se-á o foco aos filtros digitais.
 
-
-O filtro de passa-baixa (low-pass) e passa-alta (high-pass) exemplificam da maneira mais clara possível a funcionalidade de um filtro. Os filtros low-pass permitem que as frequências abaixo da frequência de corte sejam consideradas à medida que os filtros high-pass permitem a passagem das frequências acima da base de corte. As ilustrações abaixo permitem visualizar o comportamento esperado:
+O filtro de passa-baixa (low-pass) e passa-alta (high-pass) exemplificam de maneira intuitiva a funcionalidade de um filtro. Os filtros \textit{ low-pass} permitem que as frequências abaixo da frequência de corte sejam consideradas à medida que os \textit{filtros high-pass} permitem a passagem das frequências acima da base de corte. As ilustrações abaixo permitem visualizar o comportamento esperado:
 
 % TODO
 
 \section{Filtro de Kalman} \label{sec:kalmanfilter}
-Apresentado no ano de 1960 pelo criador de mesmo nome, o filtro de Kalman é um poderoso conjunto de operações as quais permitem estimar, a partir de dados ruidosos ou de pouca confiabilidade, um estado passado, presente ou futuro [1], desde que estes sejam ruídos gaussianos.  Trata-se do melhor filtro para um sistema linear [2a][3], sendo, portanto, retratado como um filtro recursivo ótimo.
+Apresentado no ano de 1960 pelo criador de mesmo nome, o filtro de Kalman é um poderoso conjunto de operações as quais permitem estimar, a partir de dados ruidosos ou de pouca confiabilidade, um estado passado, presente ou futuro \cite{WelchBishop}, desde que estes sejam ruídos gaussianos.  Trata-se do melhor filtro para um sistema linear \cite{WelchBishop}, sendo, portanto, retratado como um filtro recursivo ótimo.
 
 
 No entanto, deve-se compreender primeiramente o que significa, neste contexto, um filtro ótimo e recursivo: filtro descreve um algoritmo de processamento de dados capaz de encontrar a melhor estimativa, ótimo sinaliza que os resultados têm erros minimizados na maneira que veremos adiante, enquanto recursivo indica que não há a necessidade de guardar todas as medições anteriores e reprocessá-las a cada vez que uma nova informação é recebida, pois utiliza-se somente a informação mais recente.
 
 
-Cabe ainda esclarecer dois conceitos anteriormente mencionados: ruído gaussiano e sistema linear. O primeiro trata-se de um
-Essencialmente, o filtro de Kalman faz uso de duas funções: o predict e update.
-Dada a equação
+Cabe ainda esclarecer um conceitos anteriormente mencionado, ruído gaussiano, antes de seguir-se adiante. Trata-se de uma função de probabilidade que descreve flutuações randômicas num espaço continuo.
+Essencialmente, o filtro de Kalman soluciona o problema de tentar estimar o estado $  x \in \mathbb{R}^{n}$ pela equação de diferença estocástica linear:
+
+\begin{equation}
+x_k = Ax_{k-1} + B\mu_k + w_{k-1}
+\end{equation}
+
+com a medida $ y \in \mathbb{R}^{m}$
+
+\begin{equation}
+y_k = Hx_k + v_k
+\end{equation}
+
+A primeira equação representa que cada $x_k$ é a combinação linear do valor anterior somado ao controle de sinal $_k$ e um ruído de processo. A seugnda equação mostra que qualquer valor medido é a combinação linear do valor do sinal $x_k$ a uma medida de ruído do medição. Os ruídos são gaussianos. 
+
+O filtro aplica ainda dois conjuntos de equações, organizados em dois passos: \textit{prediction} e \textit{correction} de natureza recursiva, isto é, há um passo de previsão e um de correção das medidas obtidas. Abaixo seguem os conjuntos de equações, bem como esclarecimentos a respeito das mesmas, consoante \cite{WelchBishop} e \cite{LAARAIEDH}.
+
+Prediction
+\begin{equation}
+\hat{x}^{-}_k = A\hat{x}_{k-1} +  B\mu_k
+\end{equation}
+
+\begin{equation}
+P^{-}_k = AP_{k-1}A^{t} +  Q
+\end{equation}
+
+Correction
+\begin{equation}
+K_k = P^{-}_k H^{T} (H P^{-}_k H^{T} + R)^{-1}
+\end{equation}
+
+\begin{equation}
+\hat{x}_k = \hat{x}^{-}_k + K_k (z_k - H\hat{x}^{-}_k)
+\end{equation}
+
+\begin{equation}
+P_k = (I - K_kH)  P^{-}_k
+\end{equation}
+
+$x^{-}_k$ é a estimativa antes do passo de correção, à medida que $P^{-}_k$ é a covariância anterior ao mesmo passo. É ainda neste passo de correção que se encontra o $\hat{x}_k$, que é a estimativa de x no momento k, também encontra-se $P_k$, necessário para a estimativa futura k + 1 juntamente com $\hat{x}_k$. O ganho de Kalman $K_k$ descreve o quanto a equação precisa se ajustar no momento k. Vale ainda dizer que os valores do passo de correção são chamados de \textit{a posteriori} enquanto os valores de predição são \textit{a priori}.
+
+Em grande parte dos casos, as matrizes de estado têm valor ignorável e obtém-se a equação abaixo:
 
 \begin{equation}
 \hat{X}_k = K_k * Z_k + (1 - K_k) * \hat{X}_{k-1}
 \end{equation}
-
 
 Onde $\hat{X}_k$ é a estimativa do instante $k$, $K_k$ é o ganho de Kalman no instante $k$, $Z_k$ é o valor medido no instante $k$ e $\hat{X}_{k-1}$ é a estimativa anterior no instante $k-1$.
 
@@ -200,7 +223,10 @@ Neste trabalho apresentamos uma implementação do filtro de Kalman para estabiliz
 
 Pelos resultados obtidos, verificamos que a nossa solução desenvolvida em Unity foi capaz de filtrar as posições ruidosas geradas pelo controller e garantir um controle mais estável em aplicações de realidade virtual. E também foi feita uma implementação para visualização da filtragem de entradas ruídosas.
 
-Como trabalhos futuros propõe-se...
+Em trabalhos futuros propõe-se estender a aplicação do filtro à problemas de outras naturezas, tais quais em aplicações onde haja \textit{jittering} na movimentação de personagens ou ainda em aplicações de realidade aumentada para os mais diversos fins, como garantir que a movimentação de um \textit{non-playable character} (NPC) seja a mais suave possível. 
+
+Fora do campo da aplicações digitais, há muitos exemplos possíveis para a aplicação:  um pequeno robô de jardim que precisa saber sua verdadeira localização a fim de evitar quedas; um mapa de navegação para carros que, dentro de um túnel, precise cumprir sua função com precisão para guiar o motorista; ou ainda, a necessidade de conhecer-se a temperatura de um foguete cujo alto aquecimento impeça a medição direta através de um sensor. Se analisadas com cadência, as situações ilustradas possuem em comum a existência de informações que são passíveis de ruídos ou imprecisão os quais podem ser minimizados com o uso do filtro de Kalman.
+
 
 % TODO
 
