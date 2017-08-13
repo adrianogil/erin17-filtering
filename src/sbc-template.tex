@@ -2,8 +2,9 @@
 
 \usepackage{sbc-template}
 
-\usepackage{graphicx,url}
-
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{shapes, arrows, shapes.geometric}
 % \usepackage{subfig}
 
 \usepackage{csquotes}
@@ -81,7 +82,19 @@ Em termos de softwares matemáticos educativos para aumentar a compreensão, \cite
 \section{Filtros} \label{sec:filters}
 O dicionário Michaelis, dentre suas diversas definições, conceitua filtro como \enquote{o que tem a finalidade de selecionar}, contudo um olhar mais cuidadoso é capaz de navegar pelo emaranhado de palavras e identificar que um filtro essencialmente modifica de alguma forma a informação que recebe. Partido desta definição, \enquote{tudo é um filtro} \cite{FILTERS07}, pois os sinais sofrem interferência, portanto ruídos, dos meios externos e internos, sendo assim modificados. Para os objetivos deste texto, basta compreender um filtro como um objeto ou função cuja principal funcionalidade é remover partes indesejadas de um sinal ou ainda selecionar somente partes específicas do mesmo, como elementos que se enquadrem em determinada frequência. De maneira simplificada, o efetivo funcionamento de um filtro se dá conforme a ilustração:
 
-% Acrescentar a ilustração sobre o funcionamento básico de filtros aqui. Aqueles três quadrados
+\tikzstyle{rect} = [draw, rectangle, fill = white!20, text width=6em, text centered, minimum height = 4em]
+\tikzstyle{line} = [draw, -latex']
+
+% Acrescentar a ilustração sobre o funcionamento básico de filtros aqui. Aqueles três 
+\begin{tikzpicture} [node distance = 4cm, auto]
+\node [rect, rounded corners] (step1) {Dados originais};
+\node [rect, rounded corners, right of = step1, node distance = 5cm] (step2) {Filtro Digital};
+\node [rect, rounded corners, right of = step2, node distance = 5cm] (step3) {Dados filtrados};
+
+\path [line] (step1) -- (step2);
+\path [line] (step2) -- (step3);
+
+\end{tikzpicture}
 
 Há outra distinção importante, citada há poucas linhas, a qual deve ser salientada sobre filtros: podem ser objetos ou funções e isto basicamente retrata a existência dos filtros digitais e analógicos. Fundamentalmente a dessemelhança ocorre nos meios sobre os quais cada filtro opera, logo não é difícil discernir que os filtros analógicos fazem uso de componentes eletrônicos, tais como resistores e capacitores, enquanto os digitais operam sobre informações computadorizadas por meio de cálculos numéricos. Cabe salientar, no entanto, a relação não mutuamente exclusiva, visto que se pode estabelecer uma correspondência entre ambos através do uso de conversores analógico-digital bem como digital-analógico. Tendo em vista o objetivo proposto, dar-se-á o foco aos filtros digitais.
 
@@ -109,7 +122,7 @@ com a medida $ y \in \mathbb{R}^{m}$
 y_k = Hx_k + v_k
 \end{equation}
 
-A primeira equação representa que cada $x_k$ é a combinação linear do valor anterior somado ao controle de sinal $_k$ e um ruído de processo. A seugnda equação mostra que qualquer valor medido é a combinação linear do valor do sinal $x_k$ a uma medida de ruído do medição. Os ruídos são gaussianos. 
+A primeira equação representa que cada $x_k$ é a combinação linear do valor anterior somado ao controle de sinal $_k$ e um ruído de processo. A segunda equação mostra que qualquer valor medido é a combinação linear do valor do sinal $x_k$ a uma medida de ruído do medição. Os ruídos são gaussianos. 
 
 O filtro aplica ainda dois conjuntos de equações, organizados em dois passos: \textit{prediction} e \textit{correction} de natureza recursiva, isto é, há um passo de previsão e um de correção das medidas obtidas. Abaixo seguem os conjuntos de equações, bem como esclarecimentos a respeito das mesmas, consoante \cite{WelchBishop} e \cite{LAARAIEDH}.
 
@@ -182,7 +195,7 @@ Dado o objetivo de remover ruído de um determinando conjunto de dados sinal, é d
 
 
 % Describe Unity implementation - Noise visualization
-Para visualizar o ruido, utilizamos elementos de partículas ou \textit{ParticleSystem} para renderizar os pontos onde o cursor deveria estar levando em conta as entradas ruidosas tais como recebidas pelo controle. As partículas geradas foram configuradas para ter um cor destoante, uma tonalidade de vermelho indica a entrada real obtida pelo controle, e ao longo do tempo reduz-se a luminosidade das partículas de modo a adicionar uma informação temporal a visualização gerada. Assim, pontos vermelhos mais vivos indicam os dados mais recentes recebidos pelo controle enquanto pontos mais fracos representam posições mais antigas.
+Para visualizar o ruído, utilizamos elementos de partículas ou \textit{ParticleSystem} para renderizar os pontos onde o cursor deveria estar levando em conta as entradas ruidosas tais como recebidas pelo controle. As partículas geradas foram configuradas para ter um cor destoante, uma tonalidade de vermelho indica a entrada real obtida pelo controle, e ao longo do tempo reduz-se a luminosidade das partículas de modo a adicionar uma informação temporal a visualização gerada. Assim, pontos vermelhos mais vivos indicam os dados mais recentes recebidos pelo controle enquanto pontos mais fracos representam posições mais antigas.
 
 
 % Describe Unity implementation - GearVRInput component
