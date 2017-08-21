@@ -9,7 +9,7 @@
 
 \usepackage{csquotes}
 
-%\usepackage[brazil]{babel}
+\usepackage[brazil]{babel}
 \usepackage[latin1]{inputenc}
 
 \usepackage{amssymb}
@@ -34,18 +34,18 @@
 \maketitle
 
 \begin{abstract}
-   Kalman filter is a digital filter capable of predicting, with high precision, past, present and future states given a linear dynamic system with Gaussian noise. Even though an effective tool, Kalman filter is not usually used in Unity3D development environment. Therefore, this paper intends to implement  a visualization tool in which the filter is applied to a noisy virtual reality device joystick. It's also an objective to explain how the filter works as well as present the results of its use.
+   Kalman filter is a digital filter capable of predicting, with high precision, past, present and future states given a linear dynamic system with Gaussian noise. Even though an effective tool, Kalman filter is not a built-in implementation in Unity3D development environment. Therefore, this paper intends to implement  a visualization tool in which the Kalman filter is applied to a noisy virtual reality device joystick. It's also an objective to explain how the filter works as well as present the results of its use.
 \end{abstract}
 
 \begin{resumo}
-  O filtro de Kalman é um filtro digital capaz de prever, com precisão elevada, estados passados, presentes e futuros dado um sistema dinâmico linear cujo ruído seja gaussiano. Embora uma ferramenta eficaz, o filtro de Kalman não é comumente utilizado no ambiente de desenvolvimento Unity3D, logo o presente artigo se propõe a implementar uma ferramenta de visualização da aplicação do citado filtro em um ruidoso controle (\textit{joystick}) de um dispositivo de realidade virtual. Objetiva-se também explanar o funcionamento do filtro bem como mostrar os resultados de seu uso.
+  O filtro de Kalman é um filtro digital capaz de prever, com precisão elevada, estados passados, presentes e futuros dado um sistema dinâmico linear cujo ruído seja gaussiano. Embora uma ferramenta eficaz, o filtro de Kalman não é originalmente integrado ao ambiente de desenvolvimento Unity3D, logo o presente artigo se propõe a implementar uma ferramenta de visualização da aplicação do filtro de Kalman em um ruidoso controle (\textit{joystick}) de um dispositivo de realidade virtual. Objetiva-se também explanar o funcionamento do filtro bem como mostrar os resultados de seu uso.
 \end{resumo}
 
 
 \section{Introdução}
 
 % 1. Contextualizar o problema
-Muitos jogos ou aplicações sérias fazem uso de hardwares específico para possibilitar a interação do usuário, e.g, um gesto com as mãos, movimentos corporais. Sensores inerciais - tais como o acelerômetro, giroscópio e magnetômetro - medem a aplicação de força, taxa angular ou campo magnético, e podem ser usados como forma de virtualização de um evento na realidade do usuário para dentro de um cenário virtual. Assim jogadores de \textit{first person shooters} (FPS) conseguem disparar utilizando a posição de suas mãos, uma nave espacial rotaciona junto com o usuário, entre outras aplicações.
+Muitos jogos ou aplicações sérias fazem uso de hardwares específico para possibilitar a interação do usuário, e.g, um gesto com as mãos, movimentos corporais. Sensores inerciais - tais como o acelerômetro, giroscópio e magnetômetro - medem a aplicação de força, taxa angular ou campo magnético, e podem ser usados como forma de virtualização de um evento na realidade do usuário para dentro de um cenário virtual. Assim jogadores de \textit{first person shooters} (FPS) conseguem disparar utilizando a posição de suas mãos, uma nave espacial rotaciona junto com o movimento do usuário, entre outras aplicações.
 
 
 Estes sensores têm a finalidade de mensurar comportamentos ou características da realidade através de transdutores que convertem uma energia de entrada em outra de saída. Nesse processo é feita uma amostragem do evento de interesse, i.e., ocorre uma série de capturas da realidade de maneira a converter a medida de interesse em um conjunto contínuo de valores. Este processo também pode ser suscetível a erros, seja na natureza física do transdutor que não traduz fielmente os valores medidos, ou na taxa de amostragem que pode não ser suficiente para capturar a informação de interesse, ou na discretização dos valores contínuos da realidade. Somadas todas essas possibilidades, percebe-se que as informações essenciais (velocidade, temperatura, localização no GPS, etc.) podem sofrer ruídos ou imprecisão, isto é, o valor medido não reflete em sua totalidade a verdadeira condição do sistema no momento da medição.
@@ -53,12 +53,12 @@ Estes sensores têm a finalidade de mensurar comportamentos ou características da
 % * Definição introdutória de Filtros
 Desta forma, a fim de garantir o maior nível de aproximação no que se refere à confiabilidade das informações tratadas, os filtros digitais tornam-se ferramentas preciosas as quais visam garantir que somente os dados relevantes, pré-definidos a partir de condições estabelecidas pelas partes interessadas, sejam considerados, é o caso de filtros de passa-alta e passa-baixa, por exemplo. Dentre estes diferentes tipos de filtro passíveis de implementação, a solução mais apropriada para o problema de desconfiabilidade da informação acima mencionado é o filtro de Kalman.
 
-Entende-se que o filtro de Kalman descreve de uma solução recursiva para o problema de filtragem de dados em um sistema dinâmico linear \cite{WelchBishop}, isto é, trata-se de um sistema capaz de predizer um estado futuro baseado nas últimas informações disponíveis. Descrito como um sistema de recursivo de predição ótima, o filtro de Kalman é efetivamente utilizado em muitas aplicações do mundo real, uma delas foi a própria viagem do homem à Lua, quando necessitava-se estimar as trajetórias para a ida e volta deste satélite \cite{GrewalAndrews}. 
+Entende-se que o filtro de Kalman descreve de uma solução recursiva para o problema de filtragem de dados em um sistema dinâmico linear \cite{WelchBishop}, isto é, trata-se de um sistema capaz de predizer um estado futuro baseado nas últimas informações disponíveis. Descrito como um sistema de recursivo de predição ótima, o filtro de Kalman é efetivamente utilizado em muitas aplicações do mundo real, uma delas foi a própria viagem do homem à Lua, quando necessitava-se estimar as trajetórias para a ida e volta deste satélite \cite{GrewalAndrews}.
 
 % * Contextualizar a necessidade didática
 %     * Dificuldade de compreensão
 %     * Dificuldade de visualização
-Embora extremamente eficiente e aproveitável, esta ferramenta carece de explanações mais aproximadas dos estudantes que iniciam seus estudos acerca de filtros digitais, pois abordam o tema exclusivamente do ponto de vista da mais avançada matemática. Isto, no entanto, não pode servir de como barreira que impeça o acesso à informação por parte daqueles cujos fundamentos matemáticos não sejam de todo solidificados.
+Embora extremamente eficiente, esta ferramenta carece de explanações mais acessíveis aos estudantes que iniciam seus estudos acerca de filtros digitais, pois abordam o tema exclusivamente do ponto de vista da mais avançada matemática. Isto, no entanto, não pode servir de como barreira que impeça o acesso à informação por parte daqueles cujos fundamentos matemáticos não sejam de todo solidificados.
 
 
 % * Resumo proposta
@@ -74,16 +74,16 @@ Este trabalho analisa na seção \ref{sec:relatedworks} alguns trabalhos que abord
 % Alguns exemplos de aplicações
 Entre alguns exemplos de aplicações genéricas dos Filtros de Kalman, temos em \cite{demkowiczkalman} a demonstração de uma aplicação em Java do Filtro de Kalman em Sistemas sondadores de multi-feixe para remover ruído na visualização 3D do fundo do mar, onde os dados de entrada são filtrados duas vezes em diferentes orientações. O filtro de Kalman tem uma grande utilidade em robótica \cite{choset2005principles}, pois normalmente o conhecimento de mundo do robô deriva de medidas fornecidas por sensores imperfeitos e ruidosos.
 
-Alguns artigos trabalham com a filtragem de sensores baseados em acelerômetro.\cite{schlomer2008gesture} usa o modelo oculto de Markov para reconhecimento de gestos do usuários feitos em um Wiimote, o controle do Wii. Usa filtros simples para remover pontos que não são suficientemente significantes. \cite{shiratori2008accelerometer} utiliza múltiplos controles de Wii para criar animações procedurais. Analisa as informações do acelerômetro do Wiimote e aplica o Filtro de Kalman para remover o ruído de movimento.
+Alguns artigos trabalham com a filtragem de sensores baseados em acelerômetro. \cite{schlomer2008gesture} usa o modelo oculto de Markov para reconhecimento de gestos do usuários feitos em um \textit{Wiimote}, o controle do \textit{Wii}. Usa filtros simples para remover pontos que não são suficientemente significantes. \cite{shiratori2008accelerometer} utiliza múltiplos controles de Wii para criar animações procedurais. Analisa as informações do acelerômetro do \textit{Wiimote} e aplica o filtro de Kalman para remover o ruído de movimento.
 
-Em termos de softwares matemáticos educativos para aumentar a compreensão, \cite{guyer2008computer} apresenta uma classificação em sistema de álgebra computacional, softwares instrutivos e sistemas de propósito gerais. Este último por sua vez é dividido em ferramenta de propósito de visualização, ferramenta de informação e de ensino de conceitos. Neste trabalho, definimos a proposta como sendo de propósito de visualização, pois fornece uma compreensão aumentada de como o sinal ruidoso é filtrado na aplicação do filtro de Kalman.
+Em termos de softwares matemáticos educativos para aumentar a compreensão, \cite{guyer2008computer} apresenta uma classificação em sistema de álgebra computacional, softwares instrutivos e sistemas de propósito gerais. Este último por sua vez é dividido em ferramenta de propósito de visualização, ferramenta de informação e de ensino de conceitos. Neste trabalho, definimos a proposta como sendo de propósito de visualização, pois fornece uma compreensão aumentada de como o sinal ruidoso é filtrado para remoção de ruído.
 
 \section{Filtros} \label{sec:filters}
 O dicionário Michaelis, dentre suas diversas definições, conceitua filtro como \enquote{o que tem a finalidade de selecionar}, contudo um olhar mais cuidadoso é capaz de navegar pelo emaranhado de palavras e identificar que um filtro essencialmente modifica de alguma forma a informação que recebe. Partido desta definição, \enquote{tudo é um filtro} \cite{FILTERS07}, pois os sinais sofrem interferência, portanto ruídos, dos meios externos e internos, sendo assim modificados. Para os objetivos deste texto, basta compreender um filtro como  objeto ou função cuja principal funcionalidade é remover partes indesejadas de um sinal ou ainda selecionar somente partes específicas do mesmo, como elementos que se enquadrem em determinada frequência. De maneira simplificada, o efetivo funcionamento de um filtro se dá conforme a ilustração:
 
 \tikzstyle{rect} = [draw, rectangle, fill = white!20, text width=6em, text centered, minimum height = 4em]
 \tikzstyle{line} = [draw, -latex']
- 
+
 \begin{tikzpicture} [node distance = 4cm, auto]
 \node [rect, rounded corners] (step1) {Dados originais};
 \node [rect, rounded corners, right of = step1, node distance = 5cm] (step2) {Filtro Digital};
@@ -94,17 +94,16 @@ O dicionário Michaelis, dentre suas diversas definições, conceitua filtro como \
 
 \end{tikzpicture}
 
-Há outra distinção importante, citada há poucas linhas, a qual deve ser salientada sobre filtros: podem ser objetos ou funções e isto basicamente retrata a existência dos filtros digitais e analógicos. Fundamentalmente a dessemelhança ocorre nos meios sobre os quais cada filtro opera, logo não é difícil discernir que os filtros analógicos fazem uso de componentes eletrônicos, tais como resistores e capacitores, enquanto os digitais operam sobre informações computadorizadas por meio de cálculos numéricos. Cabe salientar, no entanto, a relação não mutuamente exclusiva, visto que se pode estabelecer uma correspondência entre ambos através do uso de conversores analógico-digital bem como digital-analógico. Tendo em vista o objetivo proposto, dar-se-á o foco aos filtros digitais.
+Fundamentalmente pode-se definir, filtros analógicos como aqueles que fazem uso de componentes eletrônicos, tais como resistores e capacitores, enquanto os digitais operam sobre informações computadorizadas por meio de cálculos numéricos.
 
-O filtro de passa-baixa (low-pass) e passa-alta (high-pass) exemplificam de maneira intuitiva a funcionalidade de um filtro. Os filtros \textit{ low-pass} permitem que as frequências abaixo da frequência de corte sejam consideradas à medida que os \textit{filtros high-pass} permitem a passagem das frequências acima da base de corte. 
+O filtro de passa-baixa (\textit{low-pass}) e passa-alta (\textit{high-pass}) exemplificam de maneira intuitiva a funcionalidade de um filtro. Os filtros \textit{low-pass} permitem que as frequências abaixo da frequência de corte sejam consideradas à medida que os \textit{filtros high-pass} permitem a passagem das frequências acima da base de corte.
 
 \section{Filtro de Kalman} \label{sec:kalmanfilter}
 Apresentado no ano de 1960 pelo criador de mesmo nome, o filtro de Kalman é um poderoso conjunto de operações as quais permitem estimar, a partir de dados ruidosos ou de pouca confiabilidade, um estado passado, presente ou futuro \cite{WelchBishop}, desde que estes sejam ruídos gaussianos.  Trata-se do melhor filtro para um sistema linear \cite{WelchBishop}, sendo, portanto, retratado como um filtro recursivo ótimo.
 
-No entanto, deve-se compreender primeiramente o que significa, neste contexto, um filtro ótimo e recursivo: filtro descreve um algoritmo de processamento de dados capaz de encontrar a melhor estimativa, ótimo sinaliza que os resultados têm erros minimizados na maneira que veremos adiante, enquanto recursivo indica que não há a necessidade de guardar todas as medições anteriores e reprocessá-las a cada vez que uma nova informação é recebida, pois utiliza-se somente a informação mais recente.
+No entanto, deve-se compreender primeiramente o que significa, neste contexto, um filtro ótimo e recursivo: o termo \enquote{filtro} descreve um algoritmo de processamento de dados capaz de encontrar a melhor estimativa, ótimo sinaliza que os resultados têm erros minimizados na maneira que veremos adiante, enquanto recursivo indica que não há a necessidade de guardar todas as medições anteriores e reprocessá-las a cada vez que uma nova informação é recebida, pois utiliza-se somente a informação mais recente.
 
-Cabe ainda esclarecer o conceito, brevemente citado, de ruído gaussiano antes de seguir adiante. Trata-se de uma função de probabilidade que descreve flutuações randômicas num espaço contínuo.
-Essencialmente, o filtro de Kalman soluciona o problema de tentar estimar o estado $  x \in \mathbb{R}^{n}$ pela equação de diferença estocástica linear:
+Cabe ainda esclarecer o conceito de filtro de Kalman como uma função de probabilidade que descreve flutuações randômicas num espaço contínuo. Essencialmente, o filtro de Kalman soluciona o problema de tentar estimar o estado $  x \in \mathbb{R}^{n}$ pela equação de diferença estocástica linear:
 
 \begin{equation}
 x_k = Ax_{k-1} + B\mu_k + w_{k-1}
@@ -116,11 +115,11 @@ com a medida $ y \in \mathbb{R}^{m}$
 y_k = Hx_k + v_k
 \end{equation}
 
-A primeira equação representa que cada $x_k$ é a combinação linear do valor anterior somado ao controle de sinal $_k$ e um ruído de processo. A segunda equação mostra que qualquer valor medido é a combinação linear do valor do sinal $x_k$ a uma medida de ruído do medição. Os ruídos são gaussianos. 
+A primeira equação representa que cada $x_k$ é a combinação linear do valor anterior somado ao controle de sinal $_k$ e um ruído de processo. A segunda equação mostra que qualquer valor medido é a combinação linear do valor do sinal $x_k$ a uma medida de ruído do medição.
 
-O filtro aplica ainda dois conjuntos de equações, organizados em dois passos: \textit{prediction} e \textit{correction} de natureza recursiva, isto é, há um passo de previsão e um de correção das medidas obtidas. Abaixo seguem os conjuntos de equações, bem como esclarecimentos a respeito das mesmos, consoante \cite{WelchBishop} e \cite{LAARAIEDH}.
+O filtro aplica ainda dois conjuntos de equações, organizados em dois passos: termos de predição e termo de correção, ambos de natureza recursiva, isto é, há um passo de previsão e um de correção das medidas obtidas. Abaixo seguem os conjuntos de equações, bem como esclarecimentos a respeito das mesmos, consoante \cite{WelchBishop} e \cite{LAARAIEDH}.
 
-Prediction
+Termos de predição podem ser dados por:
 \begin{equation}
 \hat{x}^{-}_k = A\hat{x}_{k-1} +  B\mu_k
 \end{equation}
@@ -129,7 +128,7 @@ Prediction
 P^{-}_k = AP_{k-1}A^{t} +  Q
 \end{equation}
 
-Correction
+Termos de correção podem ser dados por:
 \begin{equation}
 K_k = P^{-}_k H^{T} (H P^{-}_k H^{T} + R)^{-1}
 \end{equation}
@@ -159,7 +158,7 @@ Onde $\hat{X}_k$ é a estimativa do instante $k$, $K_k$ é o ganho de Kalman no in
 \begin{figure}[ht]
 \centering
 \includegraphics[width=.6\textwidth]{images/gear_controller.jpg}
-\caption{Filtragem do cursor de VR. Amostras ruidosas em vermelho e valor filtrado em azul.}
+\caption{Controle para Realidade Virtual da Samsung.}
 \label{fig:vrcontroller}
 \end{figure}
 
@@ -180,19 +179,28 @@ A figura \ref{fig:vrcontroller} mostra o controle que acompanha o óculos de real
 \section{Ferramenta de Visualização de Filtros} \label{sec:viztool}
 
 % Proposal
-Este artigo se propõe a implementar de uma ferramenta para a visualização da efetiva aplicação do filtro de Kalman na estabilização de um controle de realidade virtual. O uso do filtro é motivado pela necessidade de remoção dos ruídos e obtenção de um controle mais estável para o usuário. Nossa contribuição para o desenvolvedor é a capacidade de visualizar o efeito do ruído e entender como este é amenizado pelo filtro de Kalman, e, para o usuário, a criação de um componente para controle de realidade virtual que possibilite movimentos mais precisos.
+Este artigo se propõe a implementar de uma ferramenta para a visualização da efetiva aplicação do filtro de Kalman na estabilização de um controle de realidade virtual. O uso do filtro é motivado pela necessidade de remoção dos ruídos e obtenção de um controle mais estável para o usuário. Nossa contribuição para o desenvolvedor é a capacidade de visualizar o efeito do ruído e entender como este é amenizado pelo filtro de Kalman, e, para o usuário final, a criação de um componente para controle de realidade virtual que possibilite movimentos mais precisos.
 
 
 % As a didatic tool
-Dado o objetivo de remover ruídos de um determinando conjunto de sinais, é de grande interesse para o desenvolver conseguir entender como esse ruído afeta a aplicação de realidade virtual, seja produzindo um cursor mais trêmulo, portanto, menos responsivo e confiável, ou dificultando a experiência do usuário. 
+Dado o objetivo de remover ruídos de um determinando conjunto de sinais, é de grande interesse para o desenvolver conseguir entender como esse ruído afeta a aplicação de realidade virtual, seja produzindo um cursor mais trêmulo, portanto, menos responsivo e confiável, ou dificultando a experiência do usuário.
 
 
 % Describe Unity implementation - Noise visualization
 Para visualizar o ruído, utilizamos elementos de partículas ou \textit{ParticleSystem} para renderizar os pontos onde o cursor deveria estar levando em conta as entradas ruidosas tais como recebidas pelo controle. As partículas geradas foram configuradas para ter uma cor destoante, uma tonalidade de vermelho indica a entrada real obtida pelo controle e ao longo do tempo reduz-se a luminosidade das partículas de modo a adicionar uma informação temporal à visualização gerada. Assim, pontos vermelhos mais vivos indicam os dados mais recentes recebidos pelo controle enquanto pontos mais fracos representam posições mais antigas.
 
 
+Afim de comparar a entrada ruidosa e o resultado filtrado, as posições filtradas pelo filtro de Kalman foram destacadas em azul, através de \textit{TrailRenderer} que permite renderizar o caminho percorrido pelo cursor ao longo da execução da aplicação.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.5\textwidth]{images/controller_input.png}
+\caption{Componente Unity para configuração do controle da Samsung.}
+\label{fig:controllercomponent}
+\end{figure}
+
 % Describe Unity implementation - GearVRInput component
-Implementamos um componente de gerenciamento de entradas do usuário, permitindo mudar o cursor de acordo com a posição da cabeça do usuário fornecida pelo \textit{headset GearVR} ou pela rotação do controle.
+Implementamos um componente de gerenciamento de entradas do usuário chamado \textit{GazeInputModule}, permitindo mudar o cursor de acordo com a posição da cabeça do usuário fornecida pelo \textit{headset GearVR} ou pela rotação do controle.
 
 
 % Describe interaction with controller
@@ -203,14 +211,21 @@ O controle de realidade virtual da Samsung, tal como descrito na seção \ref{sec:
 
 \begin{figure}[ht]
 \centering
+\includegraphics[width=.5\textwidth]{images/sphere.png}
+\caption{Esfera invertida na cena da Unity.}
+\label{fig:invertsphere}
+\end{figure}
+
+Nossa implementação em Unity foi executada em um aparelho Samsung S8 acoplado ao óculos \textit{GearVR SM-R324}. Foi utilizado o controle oficial da Samsung que acompanha o óculos de realidade virtual \textit{GearVR}. Para fins de teste, foi gerada uma esfera invertida e um código em \textit{shader} para exibir grids na superfície da esfera gerando um ambiente branco de cor sólida e sem efeitos de iluminação, tal como exibida na figura \ref{fig:invertsphere}.
+
+Toda aplicação \textit{GearVR} distribuída na \textit{Oculus Store} \cite{gearvrstore} pode ser executada nos modelos de celulares Samsung mais avançados e acoplado a um óculos \textit{GearVR}. A qualquer momento durante a execução da aplicação é possível acessar um menu de opções que permite registrar \textit{screenshots} ou gravar vídeos da experiência vivida pelo usuário no mundo virtual estabelecido pela aplicação.
+
+\begin{figure}[ht]
+\centering
 \includegraphics[width=.5\textwidth]{images/image_01.png}
 \caption{Filtragem do cursor de VR. Amostras ruidosas em vermelho e valor filtrado em azul.}
 \label{fig:filter01}
 \end{figure}
-
-Nossa implementação em Unity foi executada em um aparelho Samsung S8 acoplado ao óculos \textit{GearVR SM-R324}. Foi utilizado o controle oficial da Samsung que acompanha o óculos de realidade virtual \textit{GearVR}. Para fins de teste, foi gerada uma esfera invertida e um código em \textit{shader} para exibir grids na superfície da esfera gerando um ambiente branco de cor sólida e sem efeitos de iluminação.
-
-Toda aplicação \textit{GearVR} distribuída na \textit{Oculus Store} \cite{gearvrstore} pode ser executada nos modelos de celulares Samsung mais avançados e acoplado a um óculos \textit{GearVR}. A qualquer momento durante a execução da aplicação é possível acessar um menu de opções que permite registrar \textit{screenshots} ou gravar vídeos da experiência vivida pelo usuário no mundo virtual estabelecido pela aplicação.
 
 A figura \ref{fig:filter01} mostra um \textit{screenshot} da aplicação em Realidade Virtual com a filtragem de cursor ativa. O caminho do cursor é definido pela rotação atual do controle do \textit{GearVR}. A posição do cursor é calculada na intersecção de uma esfera de tamanho unitário e a direção atual do controle.
 
@@ -221,15 +236,20 @@ A figura \ref{fig:filter01} mostra um \textit{screenshot} da aplicação em Realid
 \label{fig:filter02}
 \end{figure}
 
-Na figura \ref{fig:filter01} e \ref{fig:filter02} verifica-se que a linha azul forma-se de maneira estável ao longo do caminho percorrido pelo cursor. Enquanto os pontos vermelhos se espalham ao redor desse caminho, indicando que a amplitude máxima de instabilidade é cerca de duas vezes maior que o tamanho do cursor, ou seja, facilmente perceptível pelo usuário e que impossibilitaria a realização de movimentos precisos e estáveis, em outras palavras, a exatidão e responsividade esperadas do controlador não seriam atendidas. 
+Durante a execução da aplicação, percebemos que quando a movimentação do cursor é muito mais rápida que a taxa de atualização, i.e., seu \textit{Update}, verificamos que os pontos de ruído não são visualizados de maneira contínua, provocando o efeito visto na figura \ref{fig:filter02}, onde as partículas se concentram em apenas alguns pontos amostrados pelo \textit{framerate} da aplicação \textit{Unity}, gerando regiões ruidosas espaçadas entre si.
+
+Na figura \ref{fig:filter01} e \ref{fig:filter02} verifica-se que a linha azul forma-se de maneira estável ao longo do caminho percorrido pelo cursor. Enquanto os pontos vermelhos se espalham ao redor desse caminho, indicando que a amplitude máxima de instabilidade é cerca de duas vezes maior que o tamanho do cursor, ou seja, facilmente perceptível pelo usuário e que impossibilitaria a realização de movimentos precisos e estáveis, em outras palavras, a exatidão e responsividade esperadas do controlador não seriam atendidas.
 
 \section{Conclusão} \label{sec:conclusion}
 
-Neste trabalho apresentamos uma implementação do filtro de Kalman para estabilização do controle de realidade virtual da Samsung. Concomitantemente, é descrita a visualização das entradas ruidosas fornecidas pelo controle e o efeito resultante após a aplicação do filtro de Kalman. Afim de estimular a reutilização da implementações feitas, foram gerados componentes para rápida configuração.
+Neste trabalho apresentamos uma implementação do filtro de Kalman para estabilização do controle de realidade virtual da Samsung. Concomitantemente, é descrita a visualização das entradas ruidosas fornecidas pelo controle e o efeito resultante após a aplicação do filtro de Kalman. Afim de estimular a reutilização da implementações feitas, foram gerados componentes para rápida configuração, tal como demonstrado na figura \ref{fig:controllercomponent}.
 
-Pelos resultados obtidos, verificamos que a nossa solução desenvolvida em Unity3D foi capaz de filtrar as posições ruidosas geradas pelo controlador e garantir um nível de controle mais estável em aplicações de realidade virtual. Implementamos também uma ferramenta para visualização da filtragem de entradas ruidosas.
 
-Em trabalhos futuros propomos estender a aplicação do filtro à problemas de outras naturezas, tais quais em aplicações onde haja \textit{jittering} na movimentação de personagens ou ainda em aplicações de realidade aumentada para os mais diversos fins, como garantir que a movimentação de um \textit{non-playable character} (NPC) seja a mais suave possível. 
+Pelos resultados obtidos, verificamos que a nossa solução desenvolvida em \textit{Unity} foi capaz de filtrar as posições ruidosas geradas pelo controlador e garantir um nível de controle mais estável em aplicações de realidade virtual. Implementamos também uma ferramenta para visualização da filtragem de entradas ruidosas.
+
+
+Em trabalhos futuros propomos estender a aplicação do filtro à problemas de outras naturezas, tais quais em aplicações onde haja \textit{jittering} na movimentação de personagens ou ainda em aplicações de realidade aumentada para os mais diversos fins, como garantir que a movimentação de um \textit{non-playable character} (NPC) seja a mais suave possível.
+
 
 Fora do campo da aplicações digitais, há muitos exemplos possíveis para a aplicação:  um pequeno robô de jardim que precisa saber sua verdadeira localização a fim de evitar quedas; um mapa de navegação para carros que, dentro de um túnel, precise cumprir sua função com precisão para guiar o motorista; ou ainda, a necessidade de conhecer-se a temperatura de um foguete cujo alto aquecimento impeça a medição direta através de um sensor. Se analisadas com cadência, as situações ilustradas possuem em comum a existência de informações que são passíveis de ruídos ou imprecisão os quais podem ser minimizados com o uso do filtro de Kalman.
 
