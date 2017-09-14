@@ -63,10 +63,10 @@ Embora extremamente eficiente, esta ferramenta carece de explanações mais acessí
 
 
 % * Estrutura do artigo
-Analisa-se na seção \ref{sec:relatedworks} outros trabalhos que abordam o uso de filtros, sensores e sistemas de propósito educativo. Uma definição de filtros é revisada na seção \ref{sec:filters}, assim como o conceito de filtros de Kalman são explanados na seção \ref{sec:kalmanfilter}. O controle de realidade virtual da Samsung é descrito na seção \ref{sec:vrcontroller}. A implementação proposta é detalhada na seção \ref{sec:viztool} e seus resultados são discutidos na seção \ref{sec:results}. E por fim enumeram-se as conclusões e perspectivas de trabalhos futuros na seção \ref{sec:conclusion}
+Analisa-se na seção \ref{sec:relatedworks} outras pesquisas que abordam o uso de filtros, sensores e sistemas de propósito educativo. Uma breve recapitulação sobre o filtro de Kalman é apresentada na seção \ref{sec:kalmanfilter}. O controle de realidade virtual da Samsung é descrito na seção \ref{sec:vrcontroller}. A implementação proposta é detalhada na seção \ref{sec:viztool} e seus resultados são discutidos na seção \ref{sec:results}. E por fim enumeram-se as conclusões e perspectivas de trabalhos futuros na seção \ref{sec:conclusion}
 
 
-\section{Trabalhos Relacionados} \label{sec:relatedworks}
+\section{Trabalhos Correlatos} \label{sec:relatedworks}
 
 % Alguns exemplos de aplicações
 Entre alguns exemplos de emprego do Filtro de Kalman: \cite{demkowiczkalman} demonstra uma aplicação Java do filtro em sistemas sondadores de multi-feixe para remover ruído na visualização 3D do fundo do mar, onde os dados de entrada são filtrados duas vezes em diferentes orientações. \cite{choset2005principles} mostra a eficácia do citado filtro no uso de sistemas de navegação de robôs, pois normalmente o conhecimento de mundo deste robô deriva de medidas fornecidas por sensores ruidosos.
@@ -75,7 +75,7 @@ Alguns artigos trabalham com a filtragem de sensores baseados em acelerômetro: \
 
 Em termos de sistemas matemáticos educativos para melhorar a compreensão do filtro: \cite{guyer2008computer} classifica tais sistemas como sistemas de álgebra computacional, softwares instrutivos e sistemas de propósito gerais. Este último, por sua vez, é dividido em ferramenta de propósito de visualização, ferramenta de informação e ferramenta de ensino de conceitos. Nesta classificação, este trabalho tem o propósito de visualização, pois fornece uma compreensão mais ampla de como o sinal ruidoso é filtrado dentro do ambiente de desenvolvimento Unity3D.
 
-\section{Unity3D} \label{sec:unity3d}
+\section{Unity 3D} \label{sec:Unity3D}
 Também alcunhado por \textit{Unity}, trata-se de um ambiente de desenvolvimento (com \textit{engine} gráfica e editor de código) desenvolvido pela \textit{Unity Technologies}. Fornece uma plataforma para a criação de jogos e aplicativos em duas ou três dimensões, além de realidade aumentada e virtual para o público de computadores, dispostivos móveis, consoles, web e sistemas integrados ou HDM (\textit{head-mounted displays}). 
 
 Para os objetivos deste trabalho, escolheu-se o Unity3D devido à facilidade com a qual a ferramenta permite o desenvolvimento, isto é, pode-se focar no objetivo do trabalho em si, não em detalhes de implementação relacionados à itens não relevantes. Além disso, o interesse angariado nos últimos anos garantiu ao Unity3D posição de destaque nas comunidades de desenvolvimento de jogos e aplicativos em VR (\textit{virtual reality}) e AR (\textit{augmented reality}), com mais de 700 milhões de jogadores em jogos criados através da \textit{engine}. Todo este sucesso exige inovação, mas acima de tudo, experiências positivas para os consumidores. O uso do filtro, tema deste artigo, dentre suas diversas aplicações, pode auxiliar neste aspecto, visto que, neste caso, o controle torna-se mais responsivo e aprazível em seu uso. 
@@ -218,7 +218,7 @@ Na figura \ref{fig:filter01} e \ref{fig:filter02} verifica-se que a linha azul f
 Apresentou-se neste artigo uma implementação do filtro de Kalman para estabilização do controle de realidade virtual da Samsung. Concomitantemente, descreveu-se a visualização das entradas ruidosas fornecidas pelo controle e o efeito resultante após a aplicação do filtro de Kalman. Afim de estimular a reutilização da implementações feitas, foram gerados componentes para rápida configuração, tal como demonstrado na figura \ref{fig:controllercomponent}.
 
 
-Através resultados obtidos, verificou-se que a solução desenvolvida em \textit{Unity} foi capaz de filtrar as posições ruidosas geradas pelo controlador e garantir um nível de controle mais estável em aplicações de realidade virtual. Implementou-se também uma ferramenta para visualização da filtragem de entradas ruidosas.
+Através resultados obtidos, verificou-se que a solução desenvolvida em Unity3D foi capaz de filtrar as posições ruidosas geradas pelo controlador e garantir um nível de controle mais estável em aplicações de realidade virtual. Implementou-se também uma ferramenta para visualização da filtragem de entradas ruidosas.
 
 
 Em trabalhos futuros propõe-se estender a aplicação do filtro à problemas de outras naturezas, tais quais em aplicações onde haja \textit{jittering} na movimentação de personagens ou ainda em aplicações de realidade aumentada para os mais diversos fins, como garantir que a movimentação de um \textit{non-playable character} (NPC) seja a mais suave possível.
