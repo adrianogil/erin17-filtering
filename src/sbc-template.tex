@@ -132,13 +132,13 @@ $x^{-}_k$ é a estimativa antes do passo de correção, à medida que $P^{-}_k$ é a 
 \section{Controle para Realidade Virtual} \label{sec:vrcontroller}
 
 % * Qual a importância/valor de usar controles?
-Aplicativos de realidade virtual normalmente são executados dentro de óculos especialmente feitos para a renderização de duas telas, uma para cada olho, conferindo assim a ilusão de profundidade em um universo virtual, maximizando a imersão do usuário. Em aplicações de realidade virtual, normalmente o controle posiciona um cursor que representa o foco de interação do usuário.
+Aplicativos de realidade virtual normalmente são executados dentro de óculos especialmente feitos para a renderização de duas telas, uma para cada olho, conferindo assim a ilusão de profundidade em um universo virtual, maximizando a imersão do usuário. Em aplicações de realidade virtual, normalmente existe um cursor, um elemento na interface visual que representa o foco de interação do usuário. Equipamentos de realidade virtual que utilizam algum \textit{hardware} externo atuando como controle, trazem algum tipo de representação virtual desse controle permitindo que o movimento do cursor seja ditado pela equivalente movimentação do equipamento físico.
 
 % * Tipos de Controles
-Há variações no que se refere às capacidades dos diferentes tipos de controle, o próprio \textit{headset}, i.e. o equipamento de realidade virtual vestível, possui um controle baseado no giroscópio; existem também controladores que fornecem informações posicionais, permitindo um maior nível de liberdade para o usuário, visto que há a possiblidade de manipulação de diferentes elementos, além da movimentação do próprio personagem do usuário.
+Há variações no que se refere às capacidades dos diferentes tipos de controle, o próprio \textit{headset}, i.e. o equipamento de realidade virtual vestível, possui um controle baseado no giroscópio; existem também controladores que fornecem informações posicionais, permitindo um maior nível de liberdade para o usuário, visto que há a possibilidade de manipulação de diferentes elementos, além da movimentação do próprio personagem do usuário.
 
 % * Descrever controle da Samsung
-A figura \ref{fig:vrcontroller} mostra o controle que acompanha o óculos de realidade virtual \textit{GearVR SM-R324} da Samsung. A \textit{Oculus} é atualmente parceira da Samsung na distribuição de soluções para realidade virtual através de dispositivos móveis e disponibiliza um \textit{SDK} para uso de funcionalidades específicas em aplicações de realidade virtual, dentre elas uma API para captação dos dados de rotação do controle \cite{gearvrinputdocs}.
+A figura \ref{fig:vrcontroller} mostra o controle que acompanha o óculos de realidade virtual \textit{GearVR SM-R324} da Samsung. A \textit{Oculus} é atualmente parceira da Samsung na distribuição de soluções para realidade virtual através de dispositivos móveis e disponibiliza um \textit{SDK} para uso de funcionalidades específicas em aplicações de realidade virtual, dentre elas uma \textit{API}(\textit{Application Programming Interface}) para captação dos dados de rotação do controle \cite{gearvrinputdocs}.
 
 \begin{figure}[ht]
 \centering
@@ -150,13 +150,12 @@ A figura \ref{fig:vrcontroller} mostra o controle que acompanha o óculos de real
 % * Problemas/Imprecisão
 
 
-
 \section{Ferramenta de Visualização de Filtros} \label{sec:viztool}
 
 % Proposal
-Nossa proposta de ferramenta contempla a visualização da ruído de um controle do óculos de realidade virtual da Samsung e um componente implementado em \textit{Unity3D} para captura e filtragem do posicionamento do cursor da aplicação.
+Nossa proposta de ferramenta contempla a visualização do ruído de um controle do óculos \textit{GearVR} da Samsung e um componente implementado em \textit{Unity3D} para captura e filtragem do posicionamento do cursor da aplicação de realidade virtual.
 
-A figura \ref{fig:system_blocks} apresenta a arquitetura da nossa implementação. Primeiramente, capturamos a orientação angular do controle fornecida pela \textit{OVRInput API}. O próximo passo é estimar a posição do cursor dado a angulação do controle através da intersecção de um raio com a direção do controle e uma esfera de tamanho unitário. Este ponto de intersecção é a posição que o usuário está tentando apontar com o controle. Nessa posição é aplicado o filtro de Kalman para estabilização e por fim são renderizadas as posições ruidosas e o caminho percorrido pela posição estabilizada.
+A figura \ref{fig:system_blocks} apresenta a arquitetura da nossa implementação. Primeiramente, capturamos a orientação angular do controle fornecida pela \textit{OVRInput API}. O próximo passo é estimar a posição do cursor dado a angulação do controle através da intersecção do vetor de direcionamento do controle com uma esfera de tamanho unitário. Este ponto de intersecção é a posição que o usuário está tentando apontar. Nessa posição é aplicado o filtro de Kalman para estabilização e por fim são renderizadas as posições ruidosas e o caminho percorrido pela posição estabilizada.
 
 % As a didatic tool
 % Dado o objetivo de remover ruídos de um conjunto determinado de sinais, é de grande interesse para o desenvolvedor assimilar de que forma este ruído potencialmente afeta uma aplicação em realidade virtual: principalmente através da geração de um cursor mais trêmulo, menos responsivo ou confiável, dificultando, portanto, a experiência do usuário.
@@ -166,6 +165,11 @@ O controle de realidade virtual da Samsung, tal como descrito na seção \ref{sec:
 
 % Describe Unity implementation - GearVRInput component
 Implementamos um componente de gerenciamento de entradas do usuário chamado \textit{GazeInputModule}, visualizado na figura \ref{fig:controllercomponent}, que permite mudar o cursor de acordo com a posição da cabeça do usuário fornecida pelo \textit{headset GearVR} ou pela rotação do controle. Este componente posiciona um objeto (\textit{Gaze}) a uma distancia da câmera (\textit{Distance to Camera}) e possibilita aplicar alguns modos de estabilização, dentre eles a aplicação do filtro de Kalman, renderizando um objeto 3D (\textit{VR Controller}) como referência ao controle real.
+
+% Describe Unity implementation - Noise visualization
+Para visualizar o ruído, utilizou-se elementos de partículas (\textit{ParticleSystem}) para renderizar pontos onde o cursor deveria estar levando em conta as entradas ruidosas tais como recebidas pelo controle. As partículas geradas foram configuradas para ter uma cor destoante, uma tonalidade de vermelho indica a entrada real obtida pelo controle e, ao longo do tempo, reduz-se a luminosidade das partículas de modo a adicionar uma informação temporal à visualização gerada. Assim, pontos vermelhos mais vivos indicam os dados mais recentes recebidos pelo controle enquanto pontos mais fracos representam posições mais antigas.
+
+Afim de comparar a entrada ruidosa e o resultado filtrado, as posições filtradas pelo filtro de Kalman foram destacadas em azul, através de \textit{TrailRenderer} que permite renderizar o caminho percorrido pelo cursor ao longo da execução da aplicação.
 
 \begin{figure}
 \centering
@@ -185,11 +189,6 @@ Implementamos um componente de gerenciamento de entradas do usuário chamado \tex
 \end{tikzpicture}
 \caption{Diagrama de blocos da nossa proposta} \label{fig:system_blocks}
 \end{figure}
-
-% Describe Unity implementation - Noise visualization
-Para visualizar o ruído, utilizou-se elementos de partículas (\textit{ParticleSystem}) para renderizar pontos onde o cursor deveria estar levando em conta as entradas ruidosas tais como recebidas pelo controle. As partículas geradas foram configuradas para ter uma cor destoante, uma tonalidade de vermelho indica a entrada real obtida pelo controle e, ao longo do tempo, reduz-se a luminosidade das partículas de modo a adicionar uma informação temporal à visualização gerada. Assim, pontos vermelhos mais vivos indicam os dados mais recentes recebidos pelo controle enquanto pontos mais fracos representam posições mais antigas.
-
-Afim de comparar a entrada ruidosa e o resultado filtrado, as posições filtradas pelo filtro de Kalman foram destacadas em azul, através de \textit{TrailRenderer} que permite renderizar o caminho percorrido pelo cursor ao longo da execução da aplicação.
 
 \begin{figure}[ht]
 \centering
@@ -229,7 +228,7 @@ Durante a execução da aplicação, percebeu-se que quando a movimentação do cursor
 \label{fig:filter02}
 \end{figure}
 
-A figura \ref{fig:chart_noise} mostra o gráfico da velocidade do curso ao longo da execução da aplicação. Ao comparar com o gráfico gerado na mesma execução mas com o cursor filtrado, verificamos que a aplicação foi capaz de filtrar o posicionamento capturado pelo controle.
+A figura \ref{fig:chart_noise} mostra o gráfico da velocidade do curso ao longo da execução da aplicação. Ao comparar com o gráfico gerado na mesma execução mas com o cursor filtrado, observamos que este último possui uma curva mais suave, indicando que o filtro de Kalman foi capaz de filtrar o ruído e assim suavizando o posicionamento capturado pelo controle.
 
 \begin{figure}[ht]
 \centering
